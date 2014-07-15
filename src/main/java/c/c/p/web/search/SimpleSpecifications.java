@@ -33,162 +33,146 @@ import c.c.p.web.search.annotations.LikeRight;
  *
  */
 public class SimpleSpecifications {
-	
-	private static Logger LOG = LoggerFactory.getLogger(SimpleSpecifications.class);
 
-	public static <T> Specification<T> bySearchDto(final Object searchDto,
-			final Class<T> entityClazz) {
-		
-		LOG.debug("Get Specification from searchDto[{}]",searchDto);
-		
-		if(!searchDto.getClass().isAnnotationPresent(ForSearch.class)) {
-			LOG.error("Ignore field[{}] with empty value");
-		}
+    private static Logger LOG = LoggerFactory.getLogger(SimpleSpecifications.class);
 
-		return new Specification<T>() {
-			@SuppressWarnings({ "rawtypes", "unchecked" })
-			@Override
-			public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query,
-					CriteriaBuilder cb) {
+    public static <T> Specification<T> bySearchDto(final Object searchDto, final Class<T> entityClazz) {
 
-				List<Predicate> plist = new ArrayList<Predicate>();
-				
-				for (Field field : searchDto.getClass().getDeclaredFields()) {
+        LOG.debug("Get Specification from searchDto[{}]", searchDto);
 
-					try {
-						
-						if(!field.isAccessible()) {
-							field.setAccessible(true);
-						}
+        if (!searchDto.getClass().isAnnotationPresent(ForSearch.class)) {
+            LOG.error("Ignore field[{}] with empty value");
+        }
 
-						Object value = field.get(searchDto);
-						
-						if (value == null
-								|| StringUtils.isEmpty(value.toString())) {
-							
-							LOG.debug("Ignore field[{}] with empty value",field.getName());
-							continue;
-						}
-						
-						LOG.debug("Process field[{}] with value[{}]",field.getName(),value);
+        return new Specification<T>() {
+            @SuppressWarnings({ "rawtypes", "unchecked" })
+            @Override
+            public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
 
-						if (field.isAnnotationPresent(Equal.class)) {
+                List<Predicate> plist = new ArrayList<Predicate>();
 
-							String attributeName = field.getAnnotation(
-									Equal.class).name();
-							if (StringUtils.isEmpty(attributeName)) {
-								attributeName = field.getName();
-							}
+                for (Field field : searchDto.getClass().getDeclaredFields()) {
 
-							Path p = getPath(root, attributeName);
+                    try {
 
-							plist.add(cb.equal(p, value));
+                        if (!field.isAccessible()) {
+                            field.setAccessible(true);
+                        }
 
-						} else if (field
-								.isAnnotationPresent(GreaterThanOrEqualTo.class)) {
+                        Object value = field.get(searchDto);
 
-							String attributeName = field.getAnnotation(
-									GreaterThanOrEqualTo.class).name();
-							if (StringUtils.isEmpty(attributeName)) {
-								attributeName = field.getName();
-							}
+                        if (value == null || StringUtils.isEmpty(value.toString())) {
 
-							Path p = getPath(root, attributeName);
+                            LOG.debug("Ignore field[{}] with empty value", field.getName());
+                            continue;
+                        }
 
-							plist.add(cb.greaterThanOrEqualTo(p,
-									(Comparable) value));
-						} else if (field.isAnnotationPresent(GreaterThen.class)) {
-							String attributeName = field.getAnnotation(
-									GreaterThen.class).name();
-							if (StringUtils.isEmpty(attributeName)) {
-								attributeName = field.getName();
-							}
+                        LOG.debug("Process field[{}] with value[{}]", field.getName(), value);
 
-							Path p = getPath(root, attributeName);
+                        if (field.isAnnotationPresent(Equal.class)) {
 
-							plist.add(cb.greaterThan(p, (Comparable) value));
-						} else if (field.isAnnotationPresent(LessThan.class)) {
-							String attributeName = field.getAnnotation(
-									LessThan.class).name();
-							if (StringUtils.isEmpty(attributeName)) {
-								attributeName = field.getName();
-							}
+                            String attributeName = field.getAnnotation(Equal.class).name();
+                            if (StringUtils.isEmpty(attributeName)) {
+                                attributeName = field.getName();
+                            }
 
-							Path p = getPath(root, attributeName);
+                            Path p = getPath(root, attributeName);
 
-							plist.add(cb.lessThan(p, (Comparable) value));
-						} else if (field
-								.isAnnotationPresent(LessThanOrEqualTo.class)) {
-							String attributeName = field.getAnnotation(
-									LessThanOrEqualTo.class).name();
-							if (StringUtils.isEmpty(attributeName)) {
-								attributeName = field.getName();
-							}
+                            plist.add(cb.equal(p, value));
 
-							Path p = getPath(root, attributeName);
+                        } else if (field.isAnnotationPresent(GreaterThanOrEqualTo.class)) {
 
-							plist.add(cb.lessThanOrEqualTo(p,
-									(Comparable) value));
-						} else if (field
-								.isAnnotationPresent(LikeAnyWhere.class)) {
-							String attributeName = field.getAnnotation(
-									LikeAnyWhere.class).name();
-							if (StringUtils.isEmpty(attributeName)) {
-								attributeName = field.getName();
-							}
+                            String attributeName = field.getAnnotation(GreaterThanOrEqualTo.class).name();
+                            if (StringUtils.isEmpty(attributeName)) {
+                                attributeName = field.getName();
+                            }
 
-							Path p = getPath(root, attributeName);
+                            Path p = getPath(root, attributeName);
 
-							plist.add(cb.like(p, "%" + value + "%"));
-						} else if (field.isAnnotationPresent(LikeLeft.class)) {
-							String attributeName = field.getAnnotation(
-									LikeLeft.class).name();
-							if (StringUtils.isEmpty(attributeName)) {
-								attributeName = field.getName();
-							}
+                            plist.add(cb.greaterThanOrEqualTo(p, (Comparable) value));
+                        } else if (field.isAnnotationPresent(GreaterThen.class)) {
+                            String attributeName = field.getAnnotation(GreaterThen.class).name();
+                            if (StringUtils.isEmpty(attributeName)) {
+                                attributeName = field.getName();
+                            }
 
-							Path p = getPath(root, attributeName);
+                            Path p = getPath(root, attributeName);
 
-							plist.add(cb.like(p, "%" + value));
-						} else if (field.isAnnotationPresent(LikeRight.class)) {
-							String attributeName = field.getAnnotation(
-									LikeRight.class).name();
-							if (StringUtils.isEmpty(attributeName)) {
-								attributeName = field.getName();
-							}
+                            plist.add(cb.greaterThan(p, (Comparable) value));
+                        } else if (field.isAnnotationPresent(LessThan.class)) {
+                            String attributeName = field.getAnnotation(LessThan.class).name();
+                            if (StringUtils.isEmpty(attributeName)) {
+                                attributeName = field.getName();
+                            }
 
-							Path p = getPath(root, attributeName);
+                            Path p = getPath(root, attributeName);
 
-							plist.add(cb.like(p, value + "%"));
-						} else {
+                            plist.add(cb.lessThan(p, (Comparable) value));
+                        } else if (field.isAnnotationPresent(LessThanOrEqualTo.class)) {
+                            String attributeName = field.getAnnotation(LessThanOrEqualTo.class).name();
+                            if (StringUtils.isEmpty(attributeName)) {
+                                attributeName = field.getName();
+                            }
 
-							String attributeName = field.getName();
-							Path p = getPath(root, attributeName);
+                            Path p = getPath(root, attributeName);
 
-							if (value instanceof String) {
-								plist.add(cb.like(p, "%" + value + "%"));
-							} else {
-								plist.add(cb.equal(p, value));
-							}
-						}
-					} catch (Exception e) {
-						//ignore
-					}
-				}
+                            plist.add(cb.lessThanOrEqualTo(p, (Comparable) value));
+                        } else if (field.isAnnotationPresent(LikeAnyWhere.class)) {
+                            String attributeName = field.getAnnotation(LikeAnyWhere.class).name();
+                            if (StringUtils.isEmpty(attributeName)) {
+                                attributeName = field.getName();
+                            }
 
-				if (plist.size() > 0) {
-					return cb.and(plist.toArray(new Predicate[plist.size()]));
-				}
+                            Path p = getPath(root, attributeName);
 
-				return cb.conjunction();
-			}
+                            plist.add(cb.like(p, "%" + value + "%"));
+                        } else if (field.isAnnotationPresent(LikeLeft.class)) {
+                            String attributeName = field.getAnnotation(LikeLeft.class).name();
+                            if (StringUtils.isEmpty(attributeName)) {
+                                attributeName = field.getName();
+                            }
 
-			@SuppressWarnings({ "hiding", "rawtypes" })
-			private <T> Path getPath(Root<T> root, String attributeName) {
+                            Path p = getPath(root, attributeName);
 
-				Path p = root.get(attributeName);
-				return p;
-			}
-		};
-	}
+                            plist.add(cb.like(p, "%" + value));
+                        } else if (field.isAnnotationPresent(LikeRight.class)) {
+                            String attributeName = field.getAnnotation(LikeRight.class).name();
+                            if (StringUtils.isEmpty(attributeName)) {
+                                attributeName = field.getName();
+                            }
+
+                            Path p = getPath(root, attributeName);
+
+                            plist.add(cb.like(p, value + "%"));
+                        } else {
+
+                            String attributeName = field.getName();
+                            Path p = getPath(root, attributeName);
+
+                            if (value instanceof String) {
+                                plist.add(cb.like(p, "%" + value + "%"));
+                            } else {
+                                plist.add(cb.equal(p, value));
+                            }
+                        }
+                    } catch (Exception e) {
+                        // ignore
+                    }
+                }
+
+                if (plist.size() > 0) {
+                    return cb.and(plist.toArray(new Predicate[plist.size()]));
+                }
+
+                return cb.conjunction();
+            }
+
+            @SuppressWarnings({ "hiding", "rawtypes" })
+            private <T> Path getPath(Root<T> root, String attributeName) {
+
+                Path p = root.get(attributeName);
+                return p;
+            }
+        };
+    }
 }

@@ -11,5 +11,5 @@ import org.springframework.data.domain.PageRequest;
  *
  */
 public interface PagingExecute<T> {
-	public Page<T> execute(PageRequest pageRequest) ;
+    public Page<T> execute(PageRequest pageRequest);
 }

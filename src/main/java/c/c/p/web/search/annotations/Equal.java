@@ -12,10 +12,10 @@ import java.lang.annotation.Target;
  * @author Administrator
  *
  */
-@Target({ElementType.FIELD})
+@Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Equal {
 
-	String name() default "";
-	
+    String name() default "";
+
 }

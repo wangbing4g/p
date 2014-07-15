@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * @author Administrator
  *
  */
-@Target({ElementType.TYPE})
+@Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ForSearch {
 
