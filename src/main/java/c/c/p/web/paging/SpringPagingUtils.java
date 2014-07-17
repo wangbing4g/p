@@ -14,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.util.StringUtils;
 
+import c.c.p.utils.Constants;
+
 /**
  * @author Administrator
  *
@@ -34,22 +36,24 @@ public class SpringPagingUtils {
 
         Sort sort = null;
 
-        int pageNumber = 1;
-        int pagzSize = 10;
+        int pageNumber = Constants.DEFAULT_PAGE;
+        int pagzSize = Constants.DEFAULT_PAGE_SIZE;
         String sortName = "";
         String order = "";
         Map<String, String[]> params = new HashMap<String, String[]>();
         @SuppressWarnings("unchecked")
         Map<String, String[]> map = request.getParameterMap();
         for (String key : map.keySet()) {
-            if (key.equals("page")) {
+            if (key.equals(Constants.PARAMETE_PAGE)) {
                 pageNumber = Integer.parseInt(map.get(key)[0]);
-            } else if ("sort".equals(key)) {
+            } else if (Constants.PARAMETE_SORT.equals(key)) {
                 sortName = map.get(key)[0];
-            } else if ("order".equals(key)) {
+            } else if (Constants.PARAMETE_ORDER.equals(key)) {
                 order = map.get(key)[0];
-            } else if ("pageSize".equals(key)) {
+            } else if (Constants.PARAMETE_PAGESIZE.equals(key)) {
                 pagzSize = Integer.parseInt(map.get(key)[0]);
+            } else if(Constants.PARAMETE_SELECTED_IDS.equals(key)){
+                request.setAttribute(Constants.PARAMETE_SELECTED_IDS, map.get(key));
             } else {
                 params.put(key, map.get(key));
             }
@@ -58,6 +62,9 @@ public class SpringPagingUtils {
             sort = new Sort(Direction.fromString(order), sortName);
         }
 
+        /**
+         *  Mapper join >P
+         */
         StringBuilder sb = new StringBuilder();
         for (String key : params.keySet()) {
             for (String val : params.get(key)) {
