@@ -44,7 +44,7 @@ public class ManagedLog4j {
         // Get each logger from the Log4J Repository and add it to
         // the Hierarchy MBean created above.
         LoggerRepository r = LogManager.getLoggerRepository();
-        Enumeration enumer = r.getCurrentLoggers();
+        Enumeration<?> enumer = r.getCurrentLoggers();
         Logger logger = null;
 
         while (enumer.hasMoreElements()) {
