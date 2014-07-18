@@ -19,6 +19,7 @@ public final class Constants {
     public final static String PARAMETE_ORDER = "order";
     public final static String PARAMETE_PAGE = "page";
     public final static String PARAMETE_PAGESIZE = "pageSize";
+    public final static String PARAMETE_PAGE_CONTAINER = "pageContainer";
     
     
     public final static int DEFAULT_PAGE_SIZE = 20;
