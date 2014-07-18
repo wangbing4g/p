@@ -1,7 +1,7 @@
 /**
  * 
  */
-package c.c.p.web.jmx;
+package c.c.p.jmx;
 
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;

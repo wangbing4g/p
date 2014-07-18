@@ -1,7 +1,7 @@
 /**
  * 
  */
-package c.c.p.web.logger.manage;
+package c.c.p.logger.manage;
 
 import java.util.Enumeration;
 
@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.jmx.HierarchyDynamicMBean;
 import org.apache.log4j.spi.LoggerRepository;
 
-import c.c.p.web.jmx.CCPMBeanRegistry;
+import c.c.p.jmx.CCPMBeanRegistry;
 
 
 /**
