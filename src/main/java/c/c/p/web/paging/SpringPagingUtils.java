@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,17 +23,17 @@ import c.c.p.utils.Constants;
  */
 public class SpringPagingUtils {
 
-    public static <T> void paging(ServletRequest request, PagingExecute<T> execute) {
+    public static <T> void paging(HttpServletRequest request, PagingExecute<T> execute) {
         PageRequest pageRequest = createPageRequest(request);
         request.setAttribute("page", execute.execute(pageRequest));
     }
 
-    public static <T> Page<T> pagingData(ServletRequest request, PagingExecute<T> execute) {
+    public static <T> Page<T> pagingData(HttpServletRequest request, PagingExecute<T> execute) {
         PageRequest pageRequest = createPageRequest(request);
         return execute.execute(pageRequest);
     }
 
-    protected static PageRequest createPageRequest(ServletRequest request) {
+    protected static PageRequest createPageRequest(HttpServletRequest request) {
 
         Sort sort = null;
 
@@ -53,7 +54,9 @@ public class SpringPagingUtils {
             } else if (Constants.PARAMETE_PAGESIZE.equals(key)) {
                 pagzSize = Integer.parseInt(map.get(key)[0]);
             } else if(Constants.PARAMETE_SELECTED_IDS.equals(key)){
-                request.setAttribute(Constants.PARAMETE_SELECTED_IDS, map.get(key));
+                request.setAttribute(Constants.PARAMETE_SELECTED_IDS, map.get(key)[0]);
+            }  else if(Constants.PARAMETE_PAGE_CONTAINER.equals(key)){
+                request.setAttribute(Constants.PARAMETE_PAGE_CONTAINER, map.get(key)[0]);
             } else {
                 params.put(key, map.get(key));
             }
@@ -72,9 +75,10 @@ public class SpringPagingUtils {
             }
 
         }
-
+        request.setAttribute("pageLocation", request.getRequestURI());
         request.setAttribute("searchParams", sb.toString());
         request.setAttribute("sortBy", "sort=" + sortName + "&order=" + order);
+        request.setAttribute("withPageSize", "pageSize=" + pagzSize);
 
         return new PageRequest(pageNumber - 1, pagzSize, sort);
 
