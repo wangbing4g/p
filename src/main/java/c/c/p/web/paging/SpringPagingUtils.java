@@ -4,36 +4,54 @@
 package c.c.p.web.paging;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.util.StringUtils;
 
-import c.c.p.utils.Constants;
+import c.c.p.Constants;
+import c.c.p.utils.CollectionUtils;
 
 /**
  * @author Administrator
  *
  */
 public class SpringPagingUtils {
+    
+    private static Logger LOG = LoggerFactory.getLogger(SpringPagingUtils.class);
 
     public static <T> void paging(HttpServletRequest request, PagingExecute<T> execute) {
-        PageRequest pageRequest = createPageRequest(request);
+        paging(request, execute, null);
+    }
+    
+    public static <T> void paging(HttpServletRequest request, PagingExecute<T> execute,Sort defaultSort) {
+        PageRequest pageRequest = processPageRequest(request,defaultSort);
         request.setAttribute("page", execute.execute(pageRequest));
     }
 
     public static <T> Page<T> pagingData(HttpServletRequest request, PagingExecute<T> execute) {
-        PageRequest pageRequest = createPageRequest(request);
+        return pagingData(request,execute,null);
+    }
+    
+    public static <T> Page<T> pagingData(HttpServletRequest request, PagingExecute<T> execute,Sort defaultSort) {
+        PageRequest pageRequest = processPageRequest(request,defaultSort);
         return execute.execute(pageRequest);
     }
+    
+    public static PageRequest processPageRequest(HttpServletRequest request) {
+        return processPageRequest(request, null);
+    }
 
-    protected static PageRequest createPageRequest(HttpServletRequest request) {
+    public static PageRequest processPageRequest(HttpServletRequest request,Sort defaultSort) {
 
         Sort sort = null;
 
@@ -47,22 +65,45 @@ public class SpringPagingUtils {
         for (String key : map.keySet()) {
             if (key.equals(Constants.PARAMETE_PAGE)) {
                 pageNumber = Integer.parseInt(map.get(key)[0]);
+                LOG.debug("Page request paramete>pageNumber({})",pageNumber);
             } else if (Constants.PARAMETE_SORT.equals(key)) {
                 sortName = map.get(key)[0];
+                LOG.debug("Page request paramete>sortName({})",sortName);
             } else if (Constants.PARAMETE_ORDER.equals(key)) {
                 order = map.get(key)[0];
+                LOG.debug("Page request paramete>order({})",order);
             } else if (Constants.PARAMETE_PAGESIZE.equals(key)) {
                 pagzSize = Integer.parseInt(map.get(key)[0]);
+                LOG.debug("Page request paramete>pagzSize({})",pagzSize);
             } else if(Constants.PARAMETE_SELECTED_IDS.equals(key)){
-                request.setAttribute(Constants.PARAMETE_SELECTED_IDS, map.get(key)[0]);
+                
+                if(StringUtils.hasText(map.get(key)[0])) {
+                    
+                   Set<String> idset = new HashSet<String>();
+                   for(String id: map.get(key)[0].split(",")) {
+                       idset.add(id);
+                   }
+                   
+                   String selectedIdsStr = CollectionUtils.join(idset, ",");
+                   request.setAttribute("selectedIdSet", idset);
+                   request.setAttribute("selectedIdsStr", selectedIdsStr);
+                   LOG.debug("Page request paramete>selectedIdsStr({})",selectedIdsStr);
+                }
+                
             }  else if(Constants.PARAMETE_PAGE_CONTAINER.equals(key)){
-                request.setAttribute(Constants.PARAMETE_PAGE_CONTAINER, map.get(key)[0]);
+                String pageContainer = map.get(key)[0];
+                request.setAttribute(Constants.PARAMETE_PAGE_CONTAINER, pageContainer);
+                LOG.debug("Page request paramete>pageContainer({})",pageContainer);
             } else {
+                Object value = map.get(key);
                 params.put(key, map.get(key));
+                LOG.debug("Page request paramete>other ({}:{})",key,value);
             }
         }
         if (StringUtils.hasText(sortName) && StringUtils.hasText(order)) {
             sort = new Sort(Direction.fromString(order), sortName);
+        } else {
+            sort = defaultSort;
         }
 
         /**

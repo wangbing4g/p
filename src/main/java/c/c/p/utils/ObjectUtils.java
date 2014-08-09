@@ -3,9 +3,9 @@
  */
 package c.c.p.utils;
 
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import c.c.p.CCPRuntimeException;
 
 /**
  * @author zszw.now@qq.com
@@ -13,11 +13,14 @@ import java.lang.reflect.Method;
  */
 public class ObjectUtils extends org.springframework.util.ObjectUtils {
 
-    public static Object readProperty(Object obj, String property) throws IntrospectionException, IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException {
+    public static Object readProperty(Object obj, String property) throws CCPRuntimeException {
 
-        Method readMethod = ClassUtils.getAccessiableReadMethod(obj.getClass(), property);
-        return readMethod.invoke(obj);
+        try {
+            Method readMethod = ClassUtils.getAccessiableReadMethod(obj.getClass(), property);
+            return readMethod.invoke(obj);
+        } catch (Exception e) {
+           throw new CCPRuntimeException(e);
+        }
 
     }
 

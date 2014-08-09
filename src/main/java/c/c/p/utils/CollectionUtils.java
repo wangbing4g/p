@@ -32,11 +32,40 @@ public class CollectionUtils {
         StringBuilder sb = new StringBuilder(objs[0].toString());
 
         for (int i = 1; i < objs.length; i++) {
+            if(!StringUtils.hasText(objs[i].toString())) {
+                continue;
+            }
             sb.append(separator).append(objs[i]);
         }
 
         return sb.toString();
 
+    }
+    
+    public static String join(Collection<?> objs, String separator)  {
+        
+        if (isEmpty(objs)) {
+            return "";
+        }
+        
+        StringBuilder sb = null;
+        
+        boolean isFirst = true;
+        
+        for(Object obj:objs) {
+            if(!StringUtils.hasText(obj.toString())) {
+                continue;
+            }
+            if(isFirst) {
+                sb = new StringBuilder(obj.toString());
+                isFirst = false;
+            } else {
+                sb.append(",").append(obj);
+            }
+        }
+        
+        return sb.toString();
+    
     }
     
     public static boolean isEmpty(Collection<?> objs) {
